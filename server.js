@@ -6,6 +6,9 @@ const mongoose = require('mongoose');
 const http = require("http");
 const process = require("process");
 
+const ProductoController = require('./controller/productoController');
+const Producto = require('./models/producto');
+
 let app = express();
 app.use(cors());
 
@@ -35,45 +38,30 @@ app.put('/hola', (req, res) => {
 // RUTAS DE APLICACION
 
 app.get('/productos', (req, res) => {
-    res.send({
-        productos: [
-            {
-                id: 1,
-
-                urlImage: 'https://http2.mlstatic.com/cerveza-corona-D_NQ_NP_979411-MLC20550406761_012016-F.jpg',
-
-                descripcion: 'Cervezas desde back refreshed',
-                precio: 2,
-                stock: 5,
-                categoria: 'BEBIDAS'
-            },
-            {
-                id: 2,
-                descripcion: 'Cervezas 1',
-                urlImage: 'https://http2.mlstatic.com/cerveza-corona-D_NQ_NP_979411-MLC20550406761_012016-F.jpg',
-                precio: 2,
-                stock: 5,
-                categoria: 'BEBIDAS'
-            },
-            {
-                id: 3,
-                descripcion: 'Cervezas 2',
-                urlImage: 'https://http2.mlstatic.com/cerveza-corona-D_NQ_NP_979411-MLC20550406761_012016-F.jpg',
-                precio: 2,
-                stock: 5,
-                categoria: 'BEBIDAS'
-            },
-            {
-                id: 4,
-                descripcion: 'Cervezas 2',
-                urlImage: 'https://http2.mlstatic.com/cerveza-corona-D_NQ_NP_979411-MLC20550406761_012016-F.jpg',
-                precio: 2,
-                stock: 5,
-                categoria: 'BEBIDAS'
-            }
-        ]
-    })
+    ProductoController.get(res);
+    // Producto.find({}).then(productos=>{
+    //     res.send({data:productos});
+    // });
 });
+
+app.get('/productos/promesa', (req, res) => {
+    ProductoController.getPromise().then(productos=>{
+        console.log('Promesa');
+        res.send({data: productos})
+    }).catch(error => res.send({error}));
+    // ProductoController.get();
+});
+
+app.post('/producto',(req, res)=>{
+    ProductoController.insert(req.body, res);
+});
+
+app.put('/producto', (req, res) => {
+    ProductoController.update(req.body, res);
+})
+
+const conn_str = process.env.MONGODB_URI || 'mongodb://localhost:27017/ecom';
+mongoose.connect(conn_str, { useNewUrlParser: true });
 
 
 const port = process.env.PORT || "9000";
